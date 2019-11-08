@@ -8,17 +8,22 @@
 
 namespace {
 
-constexpr int N = 1<<6;
+constexpr int N = 1<<16;
+
+uint64_t rand64() {
+  return uint64_t(random()) | (uint64_t(random()) << 32);
+}
 
 }
 
-TEST(BextrTest, Basic) {
+TEST(Bextr, 64) {
   for (int i = 0; i < N; i++) {
-    int s = rand() % 64;
-    int l = rand() % (64 - s) + 1;
-    uint64_t bar = (1<<l)-1;
+    auto val = rand64();
+    int s = random() % 64;
+    int l = random() % (64 - s) + 1;
+    uint64_t bar = (l < 64) ? (1ull<<l)-1 : -1;
     uint64_t mask = bar << s;
 
-    EXPECT_EQ(bo::bextr_u64(mask, s, l), bar);
+    EXPECT_EQ(bo::bextr_u64(val, s, l), (val & mask) >> s);
   }
 }

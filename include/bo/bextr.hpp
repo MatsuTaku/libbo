@@ -16,7 +16,7 @@
 namespace bo {
 
 /* Bit field extract */
-inline uint64_t bextr_u64(const uint64_t x, const size_t start, const size_t len) {
+inline uint64_t bextr_u64(uint64_t x, size_t start, size_t len) {
   assert(start + len <= 64);
 #ifdef __BMI__
 
@@ -24,7 +24,8 @@ inline uint64_t bextr_u64(const uint64_t x, const size_t start, const size_t len
 
 #else
 
-  return (x >> start) & ((1ull << len) - 1);
+  uint64_t mask = len < 64 ? (1ull << len) - 1 : 0xFFFFFFFFFFFFFFFFull;
+  return (x >> start) & mask;
 
 #endif
 }
