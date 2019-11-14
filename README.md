@@ -25,5 +25,5 @@ C++ Header-only Library of Practical Bit Operations
   cmake --install .
   ```
   
-  We recommend to compile with option `-march=native` 
+  We recommend to compile your program with option `-march=native` 
   
