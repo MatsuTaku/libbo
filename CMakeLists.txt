@@ -13,3 +13,7 @@ target_include_directories(libbo INTERFACE include)
 
 enable_testing()
 add_subdirectory(test)
+
+file(GLOB Libbo_HEADERS "include/bo/*.hpp")
+install(FILES include/bo.hpp DESTINATION include)
+install(FILES ${Libbo_HEADERS} DESTINATION include/bo)
