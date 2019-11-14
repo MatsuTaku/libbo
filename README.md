@@ -10,3 +10,6 @@ C++ Header Library of Practical Bit Operations
   - bextr - bits extract
   - select - select nth bit
   - swapnext - swap next nth bits to each other
+  
+  ## LISENCE
+  This library is lisenced by The Unlisence.
