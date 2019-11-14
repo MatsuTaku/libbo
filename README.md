@@ -13,3 +13,17 @@ C++ Header Library of Practical Bit Operations
   
   ## LISENCE
   This library is lisenced by The Unlisence.
+  
+  ## Usage
+  You can handle libbo only including header files.
+  
+  Install to your include directory by cmake as forrows:
+  ```bash
+  cmake .
+  cmake --build .
+  ctest
+  cmake --install .
+  ```
+  
+  We recommend to compile with option `-march=native` 
+  
