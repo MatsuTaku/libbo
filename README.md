@@ -1,6 +1,6 @@
 # libbo
 
-C++ Header Library of Practical Bit Operations
+C++ Header-only Library of Practical Bit Operations
 
 ## Supporting bit operations
 
