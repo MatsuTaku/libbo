@@ -1,10 +1,10 @@
 //
-// Created by 松本拓真 on 2019/11/06.
+// Created by 松本拓真 on 2019/11/09.
 //
 
 #include "gtest/gtest.h"
 
-#include "bo/clz.hpp"
+#include "bo/ctz.hpp"
 
 namespace {
 
@@ -16,17 +16,17 @@ uint64_t rand64() {
 
 }
 
-TEST(Clz, 64) {
+TEST(Ctz, 64) {
   for (int i = 0; i < N; i++) {
     auto val = rand64();
-    int clz = 64;
-    for (int j = 63; j >= 0; j--) {
+    int ctz = 64;
+    for (int j = 0; j < 64; j++) {
       if (val & (1ull << j)) {
-        clz = 63 - j;
+        ctz = j;
         break;
       }
     }
 
-    EXPECT_EQ(bo::clz_u64(val), clz);
+    EXPECT_EQ(bo::ctz_u64(val), ctz);
   }
 }

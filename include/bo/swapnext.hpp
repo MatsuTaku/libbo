@@ -36,19 +36,19 @@ For more information, please refer to <https://unlicense.org>
 
 namespace bo {
 
-inline constexpr uint64_t swapnext_each1_u64(uint64_t x) {
+inline constexpr uint64_t swapnext1_u64(uint64_t x) {
   return ((x & 0xAAAAAAAAAAAAAAAA) >> 1) | ((x & 0x5555555555555555) << 1);
 }
 
-inline constexpr uint64_t swapnext_each2_u64(uint64_t x) {
+inline constexpr uint64_t swapnext2_u64(uint64_t x) {
   return ((x & 0xCCCCCCCCCCCCCCCC) >> 2) | ((x & 0x3333333333333333) << 2);
 }
 
-inline constexpr uint64_t swapnext_each4_u64(uint64_t x) {
+inline constexpr uint64_t swapnext4_u64(uint64_t x) {
   return ((x & 0xF0F0F0F0F0F0F0F0) >> 4) | ((x & 0x0F0F0F0F0F0F0F0F) << 4);
 }
 
-inline uint64_t swapnext_each8_u64(uint64_t x) {
+inline uint64_t swapnext8_u64(uint64_t x) {
 #ifdef __MMX__
 
   auto xx = (__m64) x;
@@ -61,7 +61,7 @@ inline uint64_t swapnext_each8_u64(uint64_t x) {
 #endif
 }
 
-inline uint64_t swapnext_each16_u64(uint64_t x) {
+inline uint64_t swapnext16_u64(uint64_t x) {
 #ifdef __MMX__
 
   auto xx = (__m64) x;
@@ -74,7 +74,7 @@ inline uint64_t swapnext_each16_u64(uint64_t x) {
 #endif
 }
 
-inline constexpr uint64_t swapnext_each32_u64(uint64_t x) {
+inline constexpr uint64_t swapnext32_u64(uint64_t x) {
   return (x >> 32) | (x << 32);
 }
 

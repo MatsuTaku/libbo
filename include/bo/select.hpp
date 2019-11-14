@@ -187,36 +187,41 @@ constexpr uint8_t kLtSel[8][256] = {
   },
 };
 
+
+
 /* Select operation for 0 index */
-inline uint64_t select_u64(uint64_t x, size_t index) {
-  assert(index < 64);
+inline uint64_t select_u64(uint64_t x, size_t nm1) {
+  assert(nm1 < 64);
 #ifdef __BMI2__
 
-  return ctz_u64(_pdep_u64(1ull << index, x));
+  return ctz_u64(_pdep_u64(1ull << nm1, x));
 
 #else
 
+  auto tx = x;
+  auto tnm1 = nm1;
   size_t ret = 0;
-  auto bit_cnt = popcnt_u32(x & 0xFFFFFFFFull);
-  if (bit_cnt <= index) {
-    x >>= 32;
+  size_t bit_cnt = popcnt_u32(uint32_t(tx & 0xFFFFFFFFull));
+  if (bit_cnt <= tnm1) {
+    tx >>= 32;
     ret += 32;
-    index -= bit_cnt;
+    tnm1 -= bit_cnt;
   }
-  bit_cnt = popcnt_u16(x & 0xFFFFull);
-  if (bit_cnt <= index) {
-    x >>= 16;
+  bit_cnt = popcnt_u16(uint16_t(tx & 0xFFFFull));
+  if (bit_cnt <= tnm1) {
+    tx >>= 16;
     ret += 16;
-    index -= bit_cnt;
+    tnm1 -= bit_cnt;
   }
-  bit_cnt = popcnt_u8(x & 0xFFull);
-  if (bit_cnt <= index) {
-    x >>= 8;
+  bit_cnt = popcnt_u8(uint8_t(tx & 0xFFull));
+  if (bit_cnt <= tnm1) {
+    tx >>= 8;
     ret += 8;
-    index -= bit_cnt;
+    tnm1 -= bit_cnt;
   }
-  
-  return ret + kLtSel[index][x & 0xFFull];
+  assert(tnm1 <= 8);
+
+  return ret + size_t(kLtSel[tnm1][tx & 0xFFull]);
 
 #endif
 }

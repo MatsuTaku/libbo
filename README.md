@@ -1,8 +1,8 @@
 # libbo
 
-C++ Header Library of Practical Bit-Operations
+C++ Header Library of Practical Bit Operations
 
-## Supporting bit-operations
+## Supporting bit operations
 
   - ctz - count trailing zeros
   - clz - count leading zeros

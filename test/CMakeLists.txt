@@ -36,11 +36,12 @@ foreach(TEST_SOURCE ${TEST_SOURCES})
 
   add_executable(${TEST_SOURCE_NAME} ${TEST_SOURCE})
   target_link_libraries(${TEST_SOURCE_NAME} gtest_main libbo)
-  add_test(${TEST_SOURCE_NAME} ${TEST_SOURCE_NAME})
+  target_compile_options(${TEST_SOURCE_NAME} PRIVATE -O3 -Wall)
+  add_test(NAME ${TEST_SOURCE_NAME} COMMAND ${TEST_SOURCE_NAME})
 
   add_executable(${TEST_SOURCE_NAME}_builtin ${TEST_SOURCE})
   target_link_libraries(${TEST_SOURCE_NAME}_builtin gtest_main libbo)
-  target_compile_options(${TEST_SOURCE_NAME}_builtin PRIVATE "-march=native")
-  add_test(${TEST_SOURCE_NAME}_builtin ${TEST_SOURCE_NAME}_builtin)
+  target_compile_options(${TEST_SOURCE_NAME}_builtin PRIVATE -march=native -O3 -Wall)
+  add_test(NAME ${TEST_SOURCE_NAME}_builtin COMMAND ${TEST_SOURCE_NAME}_builtin)
 endforeach()
 
