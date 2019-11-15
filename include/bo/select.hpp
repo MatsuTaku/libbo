@@ -196,6 +196,20 @@ inline uint64_t select_u64(uint64_t x, size_t nm1) {
 
   return ctz_u64(_pdep_u64(1ull << nm1, x));
 
+#elif defined(__MMX__)
+
+  auto c = popcnt_each8_u64(x) * 0x0101010101010101ull;
+  auto t = uint64_t(_mm_cmpgt_pi8(__m64(c), _mm_set1_pi8(nm1)));
+  t &= 0x8080808080808080ull;
+  t *= 0x0002040810204081ull;
+  t >>= 56;
+  auto i = ctz_u8(t & 0xFFull) * 8;
+
+  auto tnm1 = nm1 - (i >= 8 ? (c >> (i - 8) & 0xFFull) : 0);
+  if (tnm1 >= 8)
+	return 64;
+  return i + kLtSel[tnm1][(x >> i) & 0xFFull];
+
 #else
 
   auto tx = x;
@@ -219,8 +233,9 @@ inline uint64_t select_u64(uint64_t x, size_t nm1) {
     ret += 8;
     tnm1 -= bit_cnt;
   }
-  assert(tnm1 <= 8);
 
+  if (tnm1 >= 8)
+    return 64;
   return ret + size_t(kLtSel[tnm1][tx & 0xFFull]);
 
 #endif

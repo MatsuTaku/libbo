@@ -25,8 +25,8 @@ OTHER DEALINGS IN THE SOFTWARE.
 For more information, please refer to <https://unlicense.org>
  */
 
-#ifndef BO_CTZ_HPP_
-#define BO_CTZ_HPP_
+#ifndef BO_SUMMARY_HPP_
+#define BO_SUMMARY_HPP_
 
 #ifdef _MSC_VER
 #include <intrin.h>
@@ -34,50 +34,32 @@ For more information, please refer to <https://unlicense.org>
 #include <x86intrin.h>
 #endif
 
-#include "popcnt.hpp"
-
 namespace bo {
 
-inline uint8_t ctz_u8(uint8_t x) {
-  return popcnt_u8((x & -x) - 1);
-}
+// summarize x_{0-7} by follows:
+// { 0: x = 0
+//   1: 1 <= x < 256
+inline uint8_t summary_u64_each8(uint64_t x) {
+#ifdef __MMX__
 
-inline uint16_t ctz_u16(uint16_t x) {
-#ifdef __BMI__
-
-  return _tzcnt_u16(x);
-
-#else
-
-  return popcnt_u16((x & -x) - 1);
-
-#endif
-}
-
-inline uint32_t ctz_u32(uint32_t x) {
-#ifdef __BMI__
-
-  return _tzcnt_u32(x);
+  auto c = uint64_t(_mm_cmpeq_pi8(__m64(x), __m64(0ull)));
+  c = ~c & 0x8080808080808080ull;
 
 #else
 
-  return popcnt_u32((x & -x) - 1);
+  constexpr uint64_t hmask = 0x8080808080808080ull;
+  constexpr uint64_t lmask = 0x7F7F7F7F7F7F7F7Full;
+  uint64_t a = x & hmask;
+  uint64_t b = x & lmask;
+  b = hmask - b;
+  b = ~b;
+  auto c = (a | b) & hmask;
 
 #endif
+  c *= 0x0002040810204081ull;
+  return c >> 56;
 }
 
-inline uint64_t ctz_u64(uint64_t x) {
-#ifdef __BMI__
+} // namespace bo
 
-  return _tzcnt_u64(x);
-
-#else
-
-  return popcnt_u64((x & -x) - 1);
-
-#endif
-}
-
-}
-
-#endif //BO_CTZ_HPP_
+#endif //BO_SUMMARY_HPP_

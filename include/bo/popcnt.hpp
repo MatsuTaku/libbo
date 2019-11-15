@@ -78,6 +78,20 @@ inline uint32_t popcnt_u32(uint32_t x) {
 #endif
 }
 
+inline uint64_t popcnt_each8_u64(uint64_t x) {
+  x = x - ((x >> 1) & 0x5555555555555555ull);
+  x = (x & 0x3333333333333333ull) + ((x >> 2) & 0x3333333333333333ull);
+  return (x + (x >> 4)) & 0x0F0F0F0F0F0F0F0Full;
+}
+
+inline uint64_t popcnt_each16_u64(uint64_t x) {
+  return ((popcnt_each8_u64(x) * 0x0101) >> 8) & 0x001F001F001F001F;
+}
+
+inline uint64_t popcnt_each32_u64(uint64_t x) {
+  return ((popcnt_each8_u64(x) * 0x01010101) >> 24) & 0x0000003F0000003F;
+}
+
 inline uint64_t popcnt_u64(uint64_t x) {
 #ifdef __POPCNT__
 
@@ -85,10 +99,7 @@ inline uint64_t popcnt_u64(uint64_t x) {
 
 #else
 
-  x = x - ((x >> 1) & 0x5555555555555555ull);
-  x = (x & 0x3333333333333333ull) + ((x >> 2) & 0x3333333333333333ull);
-  x = (x + (x >> 4)) & 0x0F0F0F0F0F0F0F0Full;
-  return x*0x0101010101010101ull >> 56;
+  return (popcnt_each8_u64(x) * 0x0101010101010101) >> 56;
 
 #endif
 }

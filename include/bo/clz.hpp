@@ -36,6 +36,7 @@ For more information, please refer to <https://unlicense.org>
 
 #include <cassert>
 #include "bextr.hpp"
+#include "summary.hpp"
 
 namespace bo {
 
@@ -57,30 +58,6 @@ inline constexpr uint8_t log2p1_u8(uint8_t x) {
 inline constexpr uint8_t mssb_u8(uint8_t x) {
   assert(x != 0);
   return log2p1_u8(x) - 1;
-}
-
-// summarize x_{1-8} by follows:
-// { 0: x = 0
-//   1: 1 <= x < 256
-inline uint8_t summary_u64_each8(uint64_t x) {
-#ifdef __MMX__
-
-  auto c = uint64_t(_mm_cmpeq_pi8(__m64(x), __m64(0ull)));
-  c = ~c & 0x8080808080808080ull;
-
-#else
-
-  constexpr uint64_t hmask = 0x8080808080808080ull;
-  constexpr uint64_t lmask = 0x7F7F7F7F7F7F7F7Full;
-  uint64_t a = x & hmask;
-  uint64_t b = x & lmask;
-  b = hmask - b;
-  b = ~b;
-  auto c = (a | b) & hmask;
-
-#endif
-  c *= 0x0002040810204081ull;
-  return c >> 56;
 }
 
 inline uint64_t clz_u64(uint64_t x) {
