@@ -45,7 +45,7 @@ inline uint8_t ctz_u8(uint8_t x) {
 inline uint16_t ctz_u16(uint16_t x) {
 #ifdef __BMI__
 
-  return _tzcnt_u16(x);
+  return __tzcnt_u16(x);
 
 #else
 
