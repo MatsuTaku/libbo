@@ -40,5 +40,6 @@ For more information, please refer to <https://unlicense.org>
 #include "bo/clz.hpp"
 #include "bo/select.hpp"
 #include "bo/swapnext.hpp"
+#include "bo/bitreverse.hpp"
 
 #endif /* BO_BIT_OPERATION_HPP */
