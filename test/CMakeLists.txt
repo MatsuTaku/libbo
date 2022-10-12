@@ -1,47 +1,33 @@
-# Download and unpack googletest at configure time
-configure_file(CMakeLists.txt.in googletest-download/CMakeLists.txt)
-execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" .
-  RESULT_VARIABLE result
-  WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/googletest-download )
-if(result)
-  message(FATAL_ERROR "CMake step for googletest failed: ${result}")
-endif()
-execute_process(COMMAND ${CMAKE_COMMAND} --build .
-  RESULT_VARIABLE result
-  WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/googletest-download )
-if(result)
-  message(FATAL_ERROR "Build step for googletest failed: ${result}")
-endif()
+cmake_minimum_required(VERSION 3.14)
 
-# Prevent overriding the parent project's compiler/linker
-# settings on Windows
+# Source of a documentation of GoogleTest Quickstart: CMake (https://google.github.io/googletest/quickstart-cmake.html)
+include(FetchContent)
+FetchContent_Declare(
+  googletest
+  GIT_REPOSITORY https://github.com/google/googletest.git
+  GIT_TAG release-1.12.1
+)
+# For Windows: Prevent overriding the parent project's compiler/linker settings
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+FetchContent_MakeAvailable(googletest)
 
-# Add googletest directly to our build. This defines
-# the gtest and gtest_main targets.
-add_subdirectory(${CMAKE_CURRENT_BINARY_DIR}/googletest-src
-                 ${CMAKE_CURRENT_BINARY_DIR}/googletest-build
-                 EXCLUDE_FROM_ALL)
 
-# The gtest/gtest_main targets carry header search path
-# dependencies automatically when using CMake 2.8.11 or
-# later. Otherwise we have to add them here ourselves.
-if (CMAKE_VERSION VERSION_LESS 2.8.11)
-  include_directories("${gtest_SOURCE_DIR}/include")
-endif()
-
+include(GoogleTest)
 file(GLOB TEST_SOURCES src/*_test.cpp)
 foreach(TEST_SOURCE ${TEST_SOURCES})
   get_filename_component(TEST_SOURCE_NAME ${TEST_SOURCE} NAME_WE)
 
   add_executable(${TEST_SOURCE_NAME} ${TEST_SOURCE})
-  target_link_libraries(${TEST_SOURCE_NAME} gtest_main libbo)
+  target_link_libraries(${TEST_SOURCE_NAME} GTest::gtest_main libbo)
   target_compile_options(${TEST_SOURCE_NAME} PRIVATE -O3 -Wall)
-  add_test(NAME ${TEST_SOURCE_NAME} COMMAND ${TEST_SOURCE_NAME})
+  # add_test(NAME ${TEST_SOURCE_NAME} COMMAND ${TEST_SOURCE_NAME})
+  gtest_discover_tests(${TEST_SOURCE_NAME})
 
   add_executable(${TEST_SOURCE_NAME}_builtin ${TEST_SOURCE})
-  target_link_libraries(${TEST_SOURCE_NAME}_builtin gtest_main libbo)
+  target_link_libraries(${TEST_SOURCE_NAME}_builtin GTest::gtest_main libbo)
   target_compile_options(${TEST_SOURCE_NAME}_builtin PRIVATE -march=native -O3 -Wall)
-  add_test(NAME ${TEST_SOURCE_NAME}_builtin COMMAND ${TEST_SOURCE_NAME}_builtin)
+  # add_test(NAME ${TEST_SOURCE_NAME}_builtin COMMAND ${TEST_SOURCE_NAME}_builtin)
+  gtest_discover_tests(${TEST_SOURCE_NAME}_builtin)
 endforeach()
+
 
