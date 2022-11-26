@@ -2,6 +2,8 @@
 
 C++ Header-only Library of Practical Bit Operations
 
+[![build](https://github.com/MatsuTaku/libbo/actions/workflows/cmake_test.yml/badge.svg)](https://github.com/MatsuTaku/libbo/actions/workflows/cmake_test.yml)
+
 ## Supporting bit operations
 
   - ctz - count trailing zeros
