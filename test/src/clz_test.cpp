@@ -5,13 +5,16 @@
 #include "gtest/gtest.h"
 
 #include "bo/clz.hpp"
+#include <random>
 
 namespace {
 
 constexpr int N = 1<<16;
 
+std::default_random_engine eng(12345);
+std::uniform_int_distribution<uint64_t> dist;
 uint64_t rand64() {
-  return uint64_t(random()) | (uint64_t(random()) << 32);
+  return dist(eng);
 }
 
 }
