@@ -1,16 +1,15 @@
-name: CI
+name: build
 
-on: [push]
+on: [push, pull_request]
 
 jobs:
   build:
-
-    runs-on: ubuntu-latest
-
+    runs-on: ubuntu-20.04
     steps:
-    - uses: actions/checkout@v1
-    - name: Run a multi-line script
-      run: |
-        cmake .
-        cmake --build .
-        ctest
+      - uses: actions/checkout@v2
+      - name: Run a multi-line script
+        run: |
+          cmake -B build .
+          cmake --build build
+          cd build
+          ctest
