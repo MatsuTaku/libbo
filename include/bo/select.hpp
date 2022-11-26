@@ -205,9 +205,9 @@ inline uint64_t select_u64(uint64_t x, size_t nm1) {
   t >>= 56;
   auto i = ctz_u8(t & 0xFFull) * 8;
 
-  auto tnm1 = nm1 - (i >= 8 ? (c >> (i - 8) & 0xFFull) : 0);
+  auto tnm1 = nm1 - (i >= 8 ? ((c >> (i - 8)) & 0xFFull) : 0);
   if (tnm1 >= 8)
-	return 64;
+    return 64;
   return i + kLtSel[tnm1][(x >> i) & 0xFFull];
 
 #else
