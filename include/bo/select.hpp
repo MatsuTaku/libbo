@@ -199,7 +199,7 @@ inline uint64_t select_u64(uint64_t x, size_t nm1) {
 #elif defined(__MMX__)
 
   auto c = popcnt_each8_u64(x) * 0x0101010101010101ull;
-  auto t = uint64_t(_mm_cmpgt_pi8(__m64(c), _mm_set1_pi8(nm1)));
+  auto t = (uint64_t) _mm_sub_pi8(_mm_set1_pi8(nm1), __m64(c));
   t &= 0x8080808080808080ull;
   t *= 0x0002040810204081ull;
   t >>= 56;
