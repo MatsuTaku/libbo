@@ -33,6 +33,7 @@ For more information, please refer to <https://unlicense.org>
 #else
 #include <x86intrin.h>
 #endif
+#include <cstdint>
 
 namespace bo {
 

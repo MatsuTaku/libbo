@@ -33,15 +33,15 @@ For more information, please refer to <https://unlicense.org>
 #else
 #include <x86intrin.h>
 #endif
-
+#include <cstdint>
 #include <cassert>
 #include "bextr.hpp"
 #include "summary.hpp"
 
 namespace bo {
 
-// floor(log_2(x)) + 1
-inline constexpr uint8_t log2p1_u8(uint8_t x) {
+/// floor(log_2(x)) + 1
+constexpr uint8_t log2p1_u8(uint8_t x) {
   if (x >= 0x80)
     return 8;
 
@@ -54,25 +54,30 @@ inline constexpr uint8_t log2p1_u8(uint8_t x) {
   return p & 0b1111;
 }
 
-// Most Significant-Set Bit
-inline constexpr uint8_t mssb_u8(uint8_t x) {
+/// Most Significant-Set Bit
+constexpr uint8_t mssb_u8(uint8_t x) {
   assert(x != 0);
   return log2p1_u8(x) - 1;
 }
 
+constexpr uint64_t clz_u64_constexpr(uint64_t x) {
+  if (x == 0)
+    return 64;
+  auto i = mssb_u8(summary_u64_each8_constexpr(x));
+  auto j = mssb_u8((uint8_t) bextr_u64_constexpr(x, i * 8, 8));
+  return 63 - (i * 8 + j);
+}
+
+/// Count leading zeros
 inline uint64_t clz_u64(uint64_t x) {
 #ifdef __LZCNT__
-
   return _lzcnt_u64(x);
-
 #else
-
   if (x == 0)
     return 64;
   auto i = mssb_u8(summary_u64_each8(x));
   auto j = mssb_u8(uint8_t(bextr_u64(x, i * 8, 8)));
   return 63 - (i * 8 + j);
-
 #endif
 }
 
