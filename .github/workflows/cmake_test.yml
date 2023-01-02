@@ -1,15 +1,44 @@
 name: build
 
-on: [push, pull_request]
+on:
+  workflow_dispatch:
+  pull_request:
+  push:
+    branches:
+      - master
+      - develop
+      - feature/*
 
 jobs:
-  build:
-    runs-on: ubuntu-20.04
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: gcc-x64
+            os: ubuntu-22.04
+            compiler: g++-11
+            install: g++-11
+
+          - name: clang-x64
+            os: ubuntu-22.04
+            compiler: clang++-12
+
+          - name: clang-arm64
+            os: macos-11
+            compiler: clang++
+
+    runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v2
-      - name: Run a multi-line script
+      - uses: actions/checkout@v3
+      - name: Install dependencies
+        if: matrix.install
         run: |
-          cmake -B build .
+          sudo apt update
+          sudo apt install -y ${{ matrix.install }}
+      - name: Build and Test
+        run: |
+          cmake -B build -DCMAKE_CXX_COMPILER=${{ matrix.compiler }} .
           cmake --build build
           cd build
           ctest
