@@ -33,7 +33,7 @@ For more information, please refer to <https://unlicense.org>
 #else
 #include <x86intrin.h>
 #endif
-
+#include <cstdint>
 #include <cassert>
 
 namespace bo {
@@ -57,23 +57,26 @@ constexpr uint8_t kBitreverseTable[0x100] = {
   15, 143, 79, 207, 47, 175, 111, 239, 31, 159, 95, 223, 63, 191, 127, 255,
 };
 
-inline uint64_t bitreverse_u64(uint64_t x) {
+constexpr uint8_t bitreverse_u8(uint8_t x) {
+  return kBitreverseTable[x];
+}
+
+constexpr uint64_t bitreverse_u64_constexpr(uint64_t x) {
   x = ((x&0x5555555555555555)<<1) | ((x&0xAAAAAAAAAAAAAAAA)>>1);
   x = ((x&0x3333333333333333)<<2) | ((x&0xCCCCCCCCCCCCCCCC)>>2);
   x = ((x&0x0F0F0F0F0F0F0F0F)<<4) | ((x&0xF0F0F0F0F0F0F0F0)>>4);
-//  x = _bswap64(x);
   x = ((x&0x00FF00FF00FF00FF)<<8) | ((x&0xFF00FF00FF00FF00)>>8);
   x = ((x&0x0000FFFF0000FFFF)<<16) | ((x&0xFFFF0000FFFF0000)>>16);
   x = (x<<32) | (x>>32);
   return x;
-//  return ((uint64_t)kBitreverseTable[x&0xFF]<<56 |
-//	 	  (uint64_t)kBitreverseTable[(x>>8)&0xFF]<<48 |
-//	 	  (uint64_t)kBitreverseTable[(x>>16)&0xFF]<<40 |
-//	 	  (uint64_t)kBitreverseTable[(x>>24)&0xFF]<<32 |
-//	 	  (uint64_t)kBitreverseTable[(x>>32)&0xFF]<<24 |
-//	 	  (uint64_t)kBitreverseTable[(x>>40)&0xFF]<<16 |
-//	 	  (uint64_t)kBitreverseTable[(x>>48)&0xFF]<<8 |
-//	  	  (uint64_t)kBitreverseTable[x>>56]);
+}
+
+inline uint64_t bitreverse_u64(uint64_t x) {
+  x = ((x&0x5555555555555555)<<1) | ((x&0xAAAAAAAAAAAAAAAA)>>1);
+  x = ((x&0x3333333333333333)<<2) | ((x&0xCCCCCCCCCCCCCCCC)>>2);
+  x = ((x&0x0F0F0F0F0F0F0F0F)<<4) | ((x&0xF0F0F0F0F0F0F0F0)>>4);
+  x = _bswap64(x);
+  return x;
 }
 
 }

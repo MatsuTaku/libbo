@@ -33,17 +33,43 @@ For more information, please refer to <https://unlicense.org>
 #else
 #include <x86intrin.h>
 #endif
+#include <cstdint>
 
 namespace bo {
 
-// summarize x_{0-7} by follows:
-// { 0: x = 0
-//   1: 1 <= x < 256
-inline uint8_t summary_u64_each8(uint64_t x) {
+constexpr int movemask_u64_each8_constexpr(uint64_t x) {
+  x &= 0x8080808080808080ull;
+  return (x * 0x0002040810204081ull) >> 56;
+}
+
+inline int movemask_u64_each8(uint64_t x) {
+#ifdef __SSE__
+  return _mm_movemask_pi8((__m64) x);
+#else
+  return movemask_u64_each8_constexpr(x);
+#endif
+}
+
+constexpr int summary_u64_each8_constexpr(uint64_t x) {
+  constexpr uint64_t hmask = 0x8080808080808080ull;
+  constexpr uint64_t lmask = 0x7F7F7F7F7F7F7F7Full;
+  uint64_t a = x & hmask;
+  uint64_t b = x & lmask;
+  b = hmask - b;
+  b = ~b;
+  auto c = (a | b) & hmask;
+  return movemask_u64_each8_constexpr(c);
+}
+
+/// summarize x_{0-7}
+///   for (0 \<= i \< 8)
+///   dst[i] = { 0 (x[i*8] = 0),
+///              1 otherwise }
+inline int summary_u64_each8(uint64_t x) {
 #ifdef __MMX__
 
-  auto c = uint64_t(_mm_cmpeq_pi8(__m64(x), __m64(0ull)));
-  c = ~c & 0x8080808080808080ull;
+  auto c = (uint64_t)_mm_cmpeq_pi8(__m64(x), __m64(0ull));
+  c = ~c;
 
 #else
 
@@ -53,11 +79,11 @@ inline uint8_t summary_u64_each8(uint64_t x) {
   uint64_t b = x & lmask;
   b = hmask - b;
   b = ~b;
-  auto c = (a | b) & hmask;
+  auto c = (a | b);
 
 #endif
-  c *= 0x0002040810204081ull;
-  return c >> 56;
+
+  return movemask_u64_each8(c);
 }
 
 } // namespace bo

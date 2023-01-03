@@ -11,23 +11,32 @@ FetchContent_Declare(
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
+include(CheckCXXCompilerFlag)
+CHECK_CXX_COMPILER_FLAG("-march=native" COMPILER_SUPPORTS_MARCH)
+CHECK_CXX_COMPILER_FLAG("-mcpu=native" COMPILER_SUPPORTS_MCPU)
+if(COMPILER_SUPPORTS_MARCH)
+  set(NATIVE_OPTION "-march=native")
+elseif(COMPILER_SUPPORTS_MCPU)
+  set(NATIVE_OPTION "-mcpu=native")
+endif()
+
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall")
 
 include(GoogleTest)
 file(GLOB TEST_SOURCES src/*_test.cpp)
 foreach(TEST_SOURCE ${TEST_SOURCES})
-  get_filename_component(TEST_SOURCE_NAME ${TEST_SOURCE} NAME_WE)
+  get_filename_component(TEST_NAME ${TEST_SOURCE} NAME_WE)
 
-  add_executable(${TEST_SOURCE_NAME} ${TEST_SOURCE})
-  target_link_libraries(${TEST_SOURCE_NAME} GTest::gtest_main libbo)
-  target_compile_options(${TEST_SOURCE_NAME} PRIVATE -O3 -Wall)
-  # add_test(NAME ${TEST_SOURCE_NAME} COMMAND ${TEST_SOURCE_NAME})
-  gtest_discover_tests(${TEST_SOURCE_NAME})
+  add_executable(${TEST_NAME} ${TEST_SOURCE})
+  target_link_libraries(${TEST_NAME} GTest::gtest_main libbo)
+  gtest_discover_tests(${TEST_NAME})
 
-  add_executable(${TEST_SOURCE_NAME}_builtin ${TEST_SOURCE})
-  target_link_libraries(${TEST_SOURCE_NAME}_builtin GTest::gtest_main libbo)
-  target_compile_options(${TEST_SOURCE_NAME}_builtin PRIVATE -march=native -O3 -Wall)
-  # add_test(NAME ${TEST_SOURCE_NAME}_builtin COMMAND ${TEST_SOURCE_NAME}_builtin)
-  gtest_discover_tests(${TEST_SOURCE_NAME}_builtin)
+  set(TEST_INTRIN_NAME ${TEST_NAME}_intrin)
+  add_executable(${TEST_INTRIN_NAME} ${TEST_SOURCE})
+  target_link_libraries(${TEST_INTRIN_NAME} GTest::gtest_main libbo)
+  target_compile_options(${TEST_INTRIN_NAME} PRIVATE ${NATIVE_OPTION})
+  target_compile_definitions(${TEST_INTRIN_NAME} PRIVATE BO_INTRINSIC_ENABLED)
+  gtest_discover_tests(${TEST_INTRIN_NAME})
 endforeach()
 
 

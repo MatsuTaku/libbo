@@ -33,23 +33,23 @@ For more information, please refer to <https://unlicense.org>
 #else
 #include <x86intrin.h>
 #endif
-
+#include <cstdint>
 #include <cassert>
 
 namespace bo {
 
-/* Bit field extract */
-inline uint64_t bextr_u64(uint64_t x, size_t start, size_t len) {
+constexpr uint64_t bextr_u64_constexpr(uint64_t x, unsigned start, unsigned len) {
   assert(start + len <= 64);
-#ifdef __BMI__
-
-  return _bextr_u64(x, start, len);
-
-#else
-
   uint64_t mask = len < 64 ? (1ull << len) - 1 : 0xFFFFFFFFFFFFFFFFull;
   return (x >> start) & mask;
+}
 
+/** Bit field extract */
+inline uint64_t bextr_u64(uint64_t x, unsigned start, unsigned len) {
+#ifdef __BMI__
+  return _bextr_u64(x, start, len);
+#else
+  return bextr_u64_constexpr(x, start, len);
 #endif
 }
 

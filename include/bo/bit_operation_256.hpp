@@ -28,9 +28,18 @@ For more information, please refer to <https://unlicense.org>
 #ifndef BO_BIT_OPERATION_256_HPP_
 #define BO_BIT_OPERATION_256_HPP_
 
-#include "../bo.hpp"
+#ifdef _MSC_VER
+#include <intrin.h>
+#else
+#include <x86intrin.h>
+#endif
+#include <cstdint>
+#include <utility>
+#include "popcnt.hpp"
+#include "ctz.hpp"
+#include "clz.hpp"
 
-namespace bitop {
+namespace bo {
 
 // MARK: - set
 
@@ -59,21 +68,27 @@ inline void copy256_epi64(const uint64_t* x_addr, uint64_t* dst_addr) {
 
 // MARK: - equal
 
-inline bool is_zero256(const uint64_t* x_addr) {
-  _mm256_cmpeq_epi64()
+constexpr bool is_zero256_constexpr(const uint64_t* x_addr) {
     for (int i = 0; i < 4; i++) {
         if (*(x_addr+i) != 0)
             return false;
     }
     return true;
 }
-    
+
+inline bool is_zero256(const uint64_t* x_addr) {
 #ifdef __AVX2__
-inline bool is_zero256_intrinsics(__m256i x) {
-    int iszero_mask = _mm256_movemask_epi8(_mm256_cmpeq_epi64(x, _mm256_set1_epi64x(0)));
-    return iszero_mask == (int)0xFFFFFFFF;
-}
+
+  int iszero_mask = _mm256_movemask_pd((__m256d)
+      _mm256_cmpeq_epi64(*(__m256i*)x_addr, _mm256_set1_epi64x(0)));
+  return iszero_mask == 0xF;
+
+#else
+
+  return is_zero256_constexpr(x_addr);
+
 #endif
+}
 
 
 // MARK: - popcnt
@@ -81,7 +96,7 @@ inline bool is_zero256_intrinsics(__m256i x) {
 inline int popcnt256(const uint64_t* x_addr) {
     int cnt = 0;
     for (int i = 0; i < 4; i++)
-        cnt += popcnt64(*(x_addr+i));
+        cnt += popcnt_u64(*(x_addr+i));
     return cnt;
 }
 
@@ -90,13 +105,13 @@ inline int popcnt256(const uint64_t* x_addr) {
 
 inline int ctz256(const uint64_t* x_addr) {
     for (int i = 0; i < 4; i++) if (*(x_addr+i))
-        return 64 * i + ctz(*(x_addr+i));
+        return 64 * i + ctz_u64(*(x_addr+i));
     return 256;
 }
 
 inline int clz256(const uint64_t* x_addr) {
     for (int i = 3; i >= 0; i--) if (*(x_addr+i))
-        return 64 * i + clz(*(x_addr+i));
+        return 64 * i + clz_u64(*(x_addr+i));
     return 256;
 }
 
@@ -193,6 +208,6 @@ __m256i xor_map256_intrinsics(__m256i x, uint8_t mask) {
 }
 #endif
 
-} // namespace sim_ds::bit_util
+} // namespace bo
 
 #endif /* BO_BIT_OPERATION_256_HPP_ */

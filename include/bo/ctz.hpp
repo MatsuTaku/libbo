@@ -33,48 +33,68 @@ For more information, please refer to <https://unlicense.org>
 #else
 #include <x86intrin.h>
 #endif
-
+#include <cstdint>
 #include "popcnt.hpp"
 
 namespace bo {
 
-inline uint8_t ctz_u8(uint8_t x) {
-  return popcnt_u8((x & -x) - 1);
+constexpr uint8_t kLtCtz[256] {
+    8, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
+    4, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
+    5, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
+    4, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
+    6, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
+    4, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
+    5, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
+    4, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
+    7, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
+    4, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
+    5, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
+    4, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
+    6, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
+    4, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
+    5, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
+    4, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
+};
+
+constexpr uint8_t ctz_u8(uint8_t x) {
+  return kLtCtz[x];
+}
+
+constexpr uint16_t ctz_u16_constexpr(uint16_t x) {
+  return ((x & 0xFF) != 0) ? kLtCtz[x&0xFF] : (kLtCtz[x>>8] + 8);
 }
 
 inline uint16_t ctz_u16(uint16_t x) {
 #ifdef __BMI__
-
   return __tzcnt_u16(x);
-
 #else
-
-  return popcnt_u16((x & -x) - 1);
-
+  return ctz_u16_constexpr(x);
 #endif
+}
+
+constexpr uint32_t ctz_u32_constexpr(uint32_t x) {
+  return popcnt_u32_constexpr((x & -x) - 1);
 }
 
 inline uint32_t ctz_u32(uint32_t x) {
 #ifdef __BMI__
-
   return _tzcnt_u32(x);
-
 #else
-
   return popcnt_u32((x & -x) - 1);
-
 #endif
 }
 
+constexpr uint64_t ctz_u64_constexpr(uint64_t x) {
+  return popcnt_u64_constexpr((x & -x) - 1);
+}
+
+/// Count trailing zeros
 inline uint64_t ctz_u64(uint64_t x) {
 #ifdef __BMI__
-
   return _tzcnt_u64(x);
-
 #else
-
   return popcnt_u64((x & -x) - 1);
-
 #endif
 }
 
