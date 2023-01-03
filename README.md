@@ -2,9 +2,12 @@
 
 C++ Header-only Library of Practical Intrinsics.
 
-This library is created based on the design concept that we provide intrinsics in native for cpu architecture of each platform, with least compile flags and simple definitions.
-
 [![build](https://github.com/MatsuTaku/libbo/actions/workflows/cmake_test.yml/badge.svg)](https://github.com/MatsuTaku/libbo/actions/workflows/cmake_test.yml)
+
+This library is based on the following design principles:
+- Provides intrinsic interfaces convenience for basic **bit manipulations** and **implementing succinct data structures**.
+- Optimized intrinsic implementations can be used for any platform without considering the supporting architecture by the CPU.
+- Provides compile-time constant (a.k.a. constexpr) impelementaions for most interfaces.
 
 ## Supporting bit operations
 
@@ -14,17 +17,17 @@ This library is created based on the design concept that we provide intrinsics i
     - `clz(0b00110110) -> 2`
   - popcnt - poplation count
     - `popcnt(0b00110110) -> 4`
-  - bextr - bits extract
-    - `bextr(0b00110110, 2, 4) -> 0b00001101`
   - select - index of nth 1 (0-indexed)
     - `select(0b00110110, 2) -> 4`
+  - bextr - bits extract
+    - `bextr(0b00110110, 2, 4) -> 0b00001101`
   - bitreverse - bitwise reverse
     - `bextr(0b00110110) -> 0b01101100`
   - swapnext - swap next nth bits to each other
     - `swapnext2(0b 00 11 01 10) -> 0b 11 00 10 01`
   
-  ## LISENCE
-  This library is lisenced by The Unlisence.
+  ## LICENSE
+  This library is licensed by The Unlicense.
   
   ## Usage
   You can handle libbo only including header directory at `/include`.</br>
