@@ -37,6 +37,11 @@ For more information, please refer to <https://unlicense.org>
 
 namespace bo {
 
+constexpr int movemask_u32_each8_constexpr(uint32_t x) {
+  x &= 0x80808080u;
+  return (x * 0x00204081u) >> 24;
+}
+
 constexpr int movemask_u64_each8_constexpr(uint64_t x) {
   x &= 0x8080808080808080ull;
   return (x * 0x0002040810204081ull) >> 56;
@@ -50,14 +55,25 @@ inline int movemask_u64_each8(uint64_t x) {
 #endif
 }
 
+constexpr int summary_u32_each8_constexpr(uint32_t x) {
+  constexpr uint32_t hmask = 0x80808080u;
+  constexpr uint32_t lmask = 0x7F7F7F7Fu;
+  auto a = x & hmask;
+  auto b = x & lmask;
+  b = hmask - b;
+  b = ~b;
+  auto c = a | b;
+  return movemask_u32_each8_constexpr(c);
+}
+
 constexpr int summary_u64_each8_constexpr(uint64_t x) {
   constexpr uint64_t hmask = 0x8080808080808080ull;
   constexpr uint64_t lmask = 0x7F7F7F7F7F7F7F7Full;
-  uint64_t a = x & hmask;
-  uint64_t b = x & lmask;
+  auto a = x & hmask;
+  auto b = x & lmask;
   b = hmask - b;
   b = ~b;
-  auto c = (a | b) & hmask;
+  auto c = a | b;
   return movemask_u64_each8_constexpr(c);
 }
 

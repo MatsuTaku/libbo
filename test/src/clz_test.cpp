@@ -24,6 +24,21 @@ uint64_t rand64() {
 
 }
 
+TEST(BO_TEST_NAME(Clz), 32) {
+  for (int i = 0; i < N; i++) {
+    auto val = rand64() % (1ull<<32);
+    int clz = 32;
+    for (int j = 31; j >= 0; j--) {
+      if (val & (1ull << j)) {
+        clz = 31 - j;
+        break;
+      }
+    }
+
+    EXPECT_EQ(bo::clz_u32(val), clz);
+  }
+}
+
 TEST(BO_TEST_NAME(Clz), 64) {
   for (int i = 0; i < N; i++) {
     auto val = rand64();

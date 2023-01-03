@@ -60,6 +60,27 @@ constexpr uint8_t mssb_u8(uint8_t x) {
   return log2p1_u8(x) - 1;
 }
 
+constexpr uint32_t clz_u32_constexpr(uint32_t x) {
+  if (x == 0)
+    return 32;
+  auto i = mssb_u8(summary_u32_each8_constexpr(x));
+  auto j = mssb_u8((uint8_t) bextr_u32_constexpr(x, i * 8, 8));
+  return 31 - (i * 8 + j);
+}
+
+/// Count leading zeros
+inline uint32_t clz_u32(uint32_t x) {
+#ifdef __LZCNT__
+  return _lzcnt_u32(x);
+#else
+  if (x == 0)
+    return 32;
+  auto i = mssb_u8(summary_u64_each8(x));
+  auto j = mssb_u8((uint8_t) bextr_u32(x, i * 8, 8));
+  return 31 - (i * 8 + j);
+#endif
+}
+
 constexpr uint64_t clz_u64_constexpr(uint64_t x) {
   if (x == 0)
     return 64;

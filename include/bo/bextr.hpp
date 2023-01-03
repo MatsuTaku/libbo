@@ -38,6 +38,21 @@ For more information, please refer to <https://unlicense.org>
 
 namespace bo {
 
+constexpr uint32_t bextr_u32_constexpr(uint32_t x, unsigned start, unsigned len) {
+  assert(start + len <= 32);
+  uint32_t mask = len < 32 ? (1ull << len) - 1 : 0xFFFFFFFFu;
+  return (x >> start) & mask;
+}
+
+/** Bit field extract */
+inline uint32_t bextr_u32(uint32_t x, unsigned start, unsigned len) {
+#ifdef __BMI__
+  return _bextr_u32(x, start, len);
+#else
+  return bextr_u32_constexpr(x, start, len);
+#endif
+}
+
 constexpr uint64_t bextr_u64_constexpr(uint64_t x, unsigned start, unsigned len) {
   assert(start + len <= 64);
   uint64_t mask = len < 64 ? (1ull << len) - 1 : 0xFFFFFFFFFFFFFFFFull;
