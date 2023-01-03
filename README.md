@@ -23,8 +23,8 @@ This library is created based on the design concept that we provide intrinsics i
   - swapnext - swap next nth bits to each other
     - `swapnext2(0b 00 11 01 10) -> 0b 11 00 10 01`
   
-  ## LISENCE
-  This library is lisenced by The Unlisence.
+  ## LICENSE
+  This library is lisenced by The Unlicense.
   
   ## Usage
   You can handle libbo only including header directory at `/include`.</br>
