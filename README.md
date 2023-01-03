@@ -2,9 +2,12 @@
 
 C++ Header-only Library of Practical Intrinsics.
 
-This library is created based on the design concept that we provide intrinsics in native for cpu architecture of each platform, with least compile flags and simple definitions.
-
 [![build](https://github.com/MatsuTaku/libbo/actions/workflows/cmake_test.yml/badge.svg)](https://github.com/MatsuTaku/libbo/actions/workflows/cmake_test.yml)
+
+This library is created based on the following design principles:
+- Provides intrinsic interfaces convenience for basic **bit-manipulations** and **implementing succinct data structures**.
+- Optimized intrinsic implementations can be used for any platform without considering the supporting architecture by the CPU.
+- Provides compile-time constant (a.k.a. constexpr) impelementaions for most interfaces.
 
 ## Supporting bit operations
 
